@@ -1,0 +1,11 @@
+{
+  "domain": "arso_potresi",
+  "name": "ARSO Potresi",
+  "version": "0.0.1",
+  "documentation": "https://developers.home-assistant.io/docs/development_index/",
+  "codeowners": ["@andrejs2"],
+  "requirements": [],
+  "iot_class": "cloud_polling",
+  "config_flow": true
+  }
+  
