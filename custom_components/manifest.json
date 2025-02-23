@@ -1,12 +1,12 @@
 {
   "domain": "arso_potresi",
   "name": "ARSO Potresi",
-  "version": "1.0.0",
-  "documentation": "https://github.com/andrejs2/arso_potresi",
   "codeowners": ["@andrejs2"],
-  "requirements": [],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/andrejs2/arso_potresi",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/andrejs2/arso_potresi/issues",
-  "config_flow": true
-  }
-  
+  "requirements": [],
+  "version": "1.0.0"
+}
