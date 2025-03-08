@@ -12,6 +12,10 @@
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![GitHub Sponsors][github-shield]][github]
 
+<div align="center">
+  <img src="https://github.com/andrejs2/arso_potresi/blob/main/images/logo%402x.png?raw=true" alt="Icon Preview" width="300">
+</div>
+
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=andrejs2&repository=arso_potresi&category=integration)
 
 
