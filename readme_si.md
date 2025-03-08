@@ -1,3 +1,14 @@
+<div align="center">
+  <a href="https://potresi.arso.gov.si/">
+    <img 
+      src="https://raw.githubusercontent.com/andrejs2/arso_potresi/main/images/logo%402x.png" 
+      alt="ARSO Potresi Logo" 
+      width="300"
+    />
+  </a>
+</div>
+
+
 # ARSO Potresi - Home Assistant Custom Component
 
 [![Python][python-shield]][python]
@@ -12,11 +23,13 @@
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![GitHub Sponsors][github-shield]][github]
 
+
+
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=andrejs2&repository=arso_potresi&category=integration)
 
-**ARSO Potresi** je prilagojena (custom) integracija za [Home Assistant](https://www.home-assistant.io/), ki pridobiva podatke o potresih iz ARSO Potresi API in jih prikazuje kot entiteto tipa senzor. Senzor prikaže zadnji zaznani potres (npr. »6 km JV od Jelšan«) v svojem stanju (state), dodatne informacije pa so na voljo v atributih.
+**ARSO Potresi** je custom component integracija za [Home Assistant](https://www.home-assistant.io/), ki pridobiva podatke o potresih iz ARSO Potresi in jih prikazuje kot entiteto tipa senzor. Senzor prikaže zadnji zaznani potres (npr. »6 km JV od Jelšan«) v svojem stanju (state), dodatne informacije pa so na voljo v atributih.
 
-Podatke zagotavlja ARSO Potresi - Agencija RS za okolje.
+Vir podatkov: ARSO Potresi - Agencija RS za okolje. Ta integracija ni uradna.
 
 ---
 
