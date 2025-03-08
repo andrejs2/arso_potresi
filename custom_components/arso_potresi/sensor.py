@@ -4,9 +4,12 @@ import aiohttp
 import async_timeout
 import pytz
 
+from homeassistant.core import HomeAssistant
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import ATTR_ATTRIBUTION
 from homeassistant.util.dt import parse_datetime
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import DOMAIN, DEFAULT_API_URL
 
@@ -28,7 +31,11 @@ def format_decimal(value):
     except (ValueError, TypeError):
         return "Neznano"
 
-async def async_setup_entry(hass, config_entry, async_add_entities):
+async def async_setup_entry(
+    hass: HomeAssistant, 
+    config_entry: ConfigEntry, 
+    async_add_entities: AddEntitiesCallback
+) -> None:
     """Nastavi ARSO Potresi senzor iz config entryja."""
     scan_interval = config_entry.data.get("scan_interval", 5)
     async_add_entities([ArsoPotresiSensor(scan_interval)], True)
@@ -42,7 +49,7 @@ class ArsoPotresiSensor(Entity):
         self._state = None
         self._attributes = {}
         self._name = "ARSO Potresi"
-        self._icon = "mdi:earthquake"
+        self._icon = "mdi:pulse"
         self._unique_id = "arso_potresi_sensor"
 
     @property
