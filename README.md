@@ -34,13 +34,12 @@ Data provided by ARSO Potresi - Agencija RS za okolje
 ### Manual Installation
 
 1. Place the integration folder in your Home Assistant `custom_components` directory:
-
-    custom_components/arso_potresi/
-    ├── __init__.py
-    ├── const.py
-    ├── config_flow.py
-    └── sensor.py
-
+   ```bash
+   custom_components/arso_potresi/
+   ├── __init__.py
+   ├── const.py
+   ├── config_flow.py
+   └── sensor.py
 
 
 2. Restart Home Assistant.
