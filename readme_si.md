@@ -44,3 +44,21 @@ Podatke zagotavlja ARSO Potresi - Agencija RS za okolje.
    ├── const.py
    ├── config_flow.py
    └── sensor.py
+
+   
+[python-shield]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
+[python]: https://www.python.org/
+[releases-shield]: https://img.shields.io/github/v/release/andrejs2/arso_potresi?style=for-the-badge
+[releases]: https://github.com/andrejs2/arso_potresi/releases
+[license-shield]: https://img.shields.io/github/license/andrejs2/arso_potresi?style=for-the-badge
+[license]: ./LICENSE
+[maintainer-shield]: https://img.shields.io/badge/MAINTAINER-%40andrejs2-41BDF5?style=for-the-badge
+[maintainer]: https://github.com/andrejs2
+[homeassistant-shield]: https://img.shields.io/badge/home%20assistant-%2341BDF5.svg?style=for-the-badge&logo=home-assistant&logoColor=white
+[homeassistant]: https://www.home-assistant.io/
+[hacs-shield]: https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge
+[hacs]: https://hacs.xyz/
+[buymecoffee-shield]: https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black
+[buymecoffee]: https://www.buymeacoffee.com/andrejs2
+[github-shield]: https://img.shields.io/badge/sponsor-30363D?style=for-the-badge&logo=GitHub-Sponsors&logoColor=#EA4AAA
+[github]: https://github.com/sponsors/andrejs2
