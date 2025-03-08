@@ -1,3 +1,15 @@
+<div align="center">
+  <a href="https://potresi.arso.gov.si/">
+    <img 
+      src="https://raw.githubusercontent.com/andrejs2/arso_potresi/main/images/logo%402x.png" 
+      alt="ARSO Potresi Logo" 
+      width="300"
+    />
+  </a>
+</div>
+
+
+
 # ARSO Potresi - Home Assistant Custom Component
 
 [![Python][python-shield]][python]
@@ -12,16 +24,13 @@
 [![BuyMeCoffee][buymecoffee-shield]][buymecoffee]
 [![GitHub Sponsors][github-shield]][github]
 
-<div align="center">
-  <img src="https://github.com/andrejs2/arso_potresi/blob/main/images/logo%402x.png?raw=true" alt="Icon Preview" width="300">
-</div>
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=andrejs2&repository=arso_potresi&category=integration)
 
 
 ARSO Potresi is a custom integration for [Home Assistant](https://www.home-assistant.io/) that fetches earthquake data from the ARSO Potresi API and presents it as a sensor entity. The sensor displays the most recent earthquake's location (e.g., "6 km JV od Jelšan") as its state, while additional details are available as attributes.
 
-Data provided by ARSO Potresi - Agencija RS za okolje
+Data provided by ARSO Potresi - Agencija RS za okolje. This integration is unofficial.
 
 ## Features
 
