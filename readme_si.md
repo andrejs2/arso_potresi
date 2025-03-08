@@ -44,6 +44,56 @@ Podatke zagotavlja ARSO Potresi - Agencija RS za okolje.
    ├── const.py
    ├── config_flow.py
    └── sensor.py
+2. Ponovno zaženite Home Assistant.
+
+### Namestitev prek HACS
+
+Če uporabljate [HACS](https://hacs.xyz/), lahko ta repozitorij dodate kot **custom integration** po navodilih HACS za integracije po meri.
+
+## Konfiguracija
+
+Ta integracija se nastavi prek uporabniškega vmesnika (Config Flow). **YAML konfiguracija ni potrebna.**
+
+1. Pojdite v **Nastavitve > Naprave in storitve > Integrations**.
+2. Kliknite **Dodaj integracijo (Add Integration)** in poiščite **ARSO Potresi**.
+3. V pogovornem oknu konfiguracije nastavite interval osveževanja (v minutah).
+4. Dokončajte namestitev. Integracija bo ustvarila senzor z imenom `sensor.arso_potresi`, ki prikazuje lokacijo zadnjega zaznanega potresa kot svoje stanje, vse dodatne podrobnosti pa so na voljo v atributih.
+
+## Kako deluje
+
+- **Pridobivanje podatkov**: Senzor pridobi podatke iz ARSO Potresi API. Predvideva, da je prvi element v JSON-odgovoru najnovejši potres.
+- **Oblikovanje podatkov**:  
+  - **Lokalni čas**: Formatiran iz polja `TIME` (npr. »20. 2. 2025 ob 23.11«).
+  - **UTC čas**: Odvzet iz polja `TIME_ORIG`.
+  - **Koordinate**: Zemljepisna širina in dolžina sta zapisani z vejico kot decimalnim ločilom.
+  - **Dodatni atributi**: Globina (z besedo "km"), magnituda (z eno decimalko in vejico), intenziteta EMS-98 (prikazana kot "-" ob ničelni vrednosti) in status preverjenosti po polju `REVISION`.
+
+## Informacije o napravi
+
+Senzor se v Home Assistantu registrira kot naprava z naslednjimi podatki:
+
+- **Identifiers:** `(arso_potresi, arso_potresi_sensor)`
+- **Name:** ARSO Potresi
+- **Manufacturer:** ARSO
+- **Model:** Potresi
+
+## Reševanje težav
+
+- **Integracija se ne prikaže**:  
+  - Preverite, da je integracija nameščena v pravilno mapo: `custom_components/arso_potresi/`
+  - Preverite dnevnik (log) Home Assistanta za morebitne napake.
+  - Po namestitvi ponovno zaženite Home Assistant.
+
+- **Težave s podatki**:  
+  - V dnevniku preverite morebitna sporočila o napakah pri pridobivanju podatkov.
+
+## Prispevki
+
+Prispevki so dobrodošli!
+
+## Licenca
+
+Ta projekt je licenciran pod [MIT licenco](LICENSE).
 
    
 [python-shield]: https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54
