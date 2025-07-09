@@ -1,5 +1,6 @@
 {
     "name": "ARSO Potresi",
     "homeassistant": "2024.3.0",
-    "render_readme": true
+    "render_readme": true,
+    "country": "SI"
   }
