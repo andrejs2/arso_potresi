@@ -47,7 +47,7 @@ class ArsoPotresiSensor(Entity):
     def __init__(self, scan_interval, history_days):
         self._api_url = DEFAULT_API_URL
         self._scan_interval = timedelta(minutes=scan_interval)
-        self._history_days = history_days  # <--- SHRANIMO VREDNOST
+        self._history_days = history_days  
         self._state = None
         self._attributes = {}
         self._name = "ARSO Potresi"
@@ -98,11 +98,11 @@ class ArsoPotresiSensor(Entity):
                             _LOGGER.warning("Prejeto ni bilo podatkov")
                             return
 
-                        # --- ZAČETEK LOGIKE: Filtriranje po dnevih ---
+                       
                         now = datetime.now(pytz.utc)
                         time_limit = now - timedelta(days=self._history_days)
                         
-                        # Filtriramo seznam potresov, da ohranimo samo tiste, ki so novejši od določenega časa
+                       
                         filtered_earthquakes = [e for e in data if parse_datetime(e.get("TIME")).astimezone(pytz.utc) >= time_limit]
                         
                         if not filtered_earthquakes:
@@ -110,9 +110,7 @@ class ArsoPotresiSensor(Entity):
                             self._state = "Ni potresov"
                             self._attributes = {}
                             return
-                        # --- KONEC LOGIKE ZA FILTRIRANJE ---
-
-                        # Izberemo prvi element, ki je zdaj najnovejši med filtriranimi.
+                        
                         latest = filtered_earthquakes[0]
 
                         # Parse lokalnega časa iz TIME
@@ -131,7 +129,7 @@ class ArsoPotresiSensor(Entity):
                         intensity = latest.get("INTENZITETA") if latest.get("INTENZITETA") is not None else "-"
                         verified = "DA" if latest.get("REVISION") == 1 else "NE"
 
-                        # Nastavimo stanje senzorja (state) kot opis nadžarišča
+                        
                         self._state = latest.get("GEOLOC", "Neznano")
                         self._attributes = {
                             "Lokalni čas potresa": format_datetime(dt_local),
@@ -145,7 +143,7 @@ class ArsoPotresiSensor(Entity):
                             ATTR_ATTRIBUTION: ATTRIBUTION,
                         }
                         
-                        # --- ZAČETEK NOVE KODE: Zgodovina potresov ---
+                       
                         history = []
                         
                         for earthquake in filtered_earthquakes:
@@ -178,7 +176,7 @@ class ArsoPotresiSensor(Entity):
                             history.append(earthquake_data)
 
                         self._attributes["Zgodovina potresov"] = history
-                        # --- KONEC NOVE KODE ---
+                       
 
         except Exception as e:
             _LOGGER.error("Prišlo je do izjeme pri async_update: %s", e)
