@@ -11,7 +11,7 @@ from homeassistant.const import ATTR_ATTRIBUTION
 from homeassistant.util.dt import parse_datetime
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN, DEFAULT_API_URL
+from .const import DOMAIN, DEFAULT_API_URL, DEFAULT_SCAN_INTERVAL, DEFAULT_HISTORY_DAYS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,8 +37,9 @@ async def async_setup_entry(
     async_add_entities: AddEntitiesCallback
 ) -> None:
     """Nastavi ARSO Potresi senzor iz config entryja."""
-    scan_interval = config_entry.data.get("scan_interval", 5)
-    history_days = config_entry.data.get("history_days", 7) # <--- PREBEREMO NOVO POLJE
+    options = config_entry.options or config_entry.data
+    scan_interval = options.get("scan_interval", DEFAULT_SCAN_INTERVAL)
+    history_days = options.get("history_days", DEFAULT_HISTORY_DAYS)
     async_add_entities([ArsoPotresiSensor(scan_interval, history_days)], True)
 
 class ArsoPotresiSensor(Entity):
@@ -47,7 +48,7 @@ class ArsoPotresiSensor(Entity):
     def __init__(self, scan_interval, history_days):
         self._api_url = DEFAULT_API_URL
         self._scan_interval = timedelta(minutes=scan_interval)
-        self._history_days = history_days  
+        self._history_days = history_days
         self._state = None
         self._attributes = {}
         self._name = "ARSO Potresi"
@@ -98,11 +99,9 @@ class ArsoPotresiSensor(Entity):
                             _LOGGER.warning("Prejeto ni bilo podatkov")
                             return
 
-                       
                         now = datetime.now(pytz.utc)
                         time_limit = now - timedelta(days=self._history_days)
                         
-                       
                         filtered_earthquakes = [e for e in data if parse_datetime(e.get("TIME")).astimezone(pytz.utc) >= time_limit]
                         
                         if not filtered_earthquakes:
@@ -110,10 +109,9 @@ class ArsoPotresiSensor(Entity):
                             self._state = "Ni potresov"
                             self._attributes = {}
                             return
-                        
+
                         latest = filtered_earthquakes[0]
 
-                        # Parse lokalnega časa iz TIME
                         dt_local = parse_datetime(latest.get("TIME"))
                         try:
                             dt_utc = pytz.UTC.localize(datetime.strptime(latest.get("TIME_ORIG"), "%Y-%m-%d %H:%M:%S"))
@@ -129,7 +127,6 @@ class ArsoPotresiSensor(Entity):
                         intensity = latest.get("INTENZITETA") if latest.get("INTENZITETA") is not None else "-"
                         verified = "DA" if latest.get("REVISION") == 1 else "NE"
 
-                        
                         self._state = latest.get("GEOLOC", "Neznano")
                         self._attributes = {
                             "Lokalni čas potresa": format_datetime(dt_local),
@@ -143,11 +140,8 @@ class ArsoPotresiSensor(Entity):
                             ATTR_ATTRIBUTION: ATTRIBUTION,
                         }
                         
-                       
                         history = []
-                        
                         for earthquake in filtered_earthquakes:
-                            # Parse lokalnega časa iz TIME
                             dt_local_hist = parse_datetime(earthquake.get("TIME"))
                             try:
                                 dt_utc_hist = pytz.UTC.localize(datetime.strptime(earthquake.get("TIME_ORIG"), "%Y-%m-%d %H:%M:%S"))
@@ -176,7 +170,6 @@ class ArsoPotresiSensor(Entity):
                             history.append(earthquake_data)
 
                         self._attributes["Zgodovina potresov"] = history
-                       
 
         except Exception as e:
             _LOGGER.error("Prišlo je do izjeme pri async_update: %s", e)
