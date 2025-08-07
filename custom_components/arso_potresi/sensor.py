@@ -169,7 +169,6 @@ class ArsoPotresiSensor(Entity):
                             }
                             history.append(earthquake_data)
 
-                        # Tukaj je manjkala vrstica, ki jo zdaj dodam
                         self._attributes["Zgodovina potresov"] = history
 
         except Exception as e:
