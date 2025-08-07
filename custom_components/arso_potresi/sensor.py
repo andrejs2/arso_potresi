@@ -38,14 +38,16 @@ async def async_setup_entry(
 ) -> None:
     """Nastavi ARSO Potresi senzor iz config entryja."""
     scan_interval = config_entry.data.get("scan_interval", 5)
-    async_add_entities([ArsoPotresiSensor(scan_interval)], True)
+    history_days = config_entry.data.get("history_days", 7) # <--- PREBEREMO NOVO POLJE
+    async_add_entities([ArsoPotresiSensor(scan_interval, history_days)], True)
 
 class ArsoPotresiSensor(Entity):
     """Senzor, ki prikazuje zadnji potres z oblikovanimi podatki."""
 
-    def __init__(self, scan_interval):
-        self._api_url = DEFAULT_API_URL  # API URL je hardcoded
+    def __init__(self, scan_interval, history_days):
+        self._api_url = DEFAULT_API_URL
         self._scan_interval = timedelta(minutes=scan_interval)
+        self._history_days = history_days  # <--- SHRANIMO VREDNOST
         self._state = None
         self._attributes = {}
         self._name = "ARSO Potresi"
@@ -96,32 +98,37 @@ class ArsoPotresiSensor(Entity):
                             _LOGGER.warning("Prejeto ni bilo podatkov")
                             return
 
-                        # Izberemo prvi element, predpostavljamo, da je najnovejši potres.
-                        latest = data[0]
+                        # --- ZAČETEK LOGIKE: Filtriranje po dnevih ---
+                        now = datetime.now(pytz.utc)
+                        time_limit = now - timedelta(days=self._history_days)
+                        
+                        # Filtriramo seznam potresov, da ohranimo samo tiste, ki so novejši od določenega časa
+                        filtered_earthquakes = [e for e in data if parse_datetime(e.get("TIME")).astimezone(pytz.utc) >= time_limit]
+                        
+                        if not filtered_earthquakes:
+                            _LOGGER.warning("Ni potresov v izbranem časovnem obdobju.")
+                            self._state = "Ni potresov"
+                            self._attributes = {}
+                            return
+                        # --- KONEC LOGIKE ZA FILTRIRANJE ---
 
-                        # Parse lokalnega časa iz TIME (npr. "2025-02-20T23:11:16+0100")
+                        # Izberemo prvi element, ki je zdaj najnovejši med filtriranimi.
+                        latest = filtered_earthquakes[0]
+
+                        # Parse lokalnega časa iz TIME
                         dt_local = parse_datetime(latest.get("TIME"))
-                        # Parse UTC časa iz TIME_ORIG (npr. "2025-02-20 22:11:16") in označimo UTC
                         try:
                             dt_utc = pytz.UTC.localize(datetime.strptime(latest.get("TIME_ORIG"), "%Y-%m-%d %H:%M:%S"))
                         except Exception:
                             dt_utc = None
 
-                        # Formatiramo geografske koordinate, pretvorimo piko v vejico
                         lat_str = f"{latest.get('LAT')}".replace(".", ",") if latest.get("LAT") is not None else "Neznano"
                         lon_str = f"{latest.get('LON')}".replace(".", ",") if latest.get("LON") is not None else "Neznano"
                         lat_lon = f"{lat_str} / {lon_str}"
 
-                        # Globina z oznako "km"
                         depth = f"{latest.get('DEPTH')} km" if latest.get("DEPTH") is not None else "Neznano"
-
-                        # Magnituda z eno decimalno natančnostjo in vejico
                         mag = format_decimal(latest.get("MAG1"))
-
-                        # Največja intenziteta EMS-98: če je vrednost null, prikažemo "-"
                         intensity = latest.get("INTENZITETA") if latest.get("INTENZITETA") is not None else "-"
-
-                        # Podatki so bili preverjeni s strani seizmologa: če REVISION == 1, potem DA, sicer NE
                         verified = "DA" if latest.get("REVISION") == 1 else "NE"
 
                         # Nastavimo stanje senzorja (state) kot opis nadžarišča
@@ -136,7 +143,42 @@ class ArsoPotresiSensor(Entity):
                             "Največja intenziteta EMS-98": intensity,
                             "Preverjeno s strani seizmologa": verified,
                             ATTR_ATTRIBUTION: ATTRIBUTION,
-                            #"objectid": latest.get("OBJECTID")
                         }
+                        
+                        # --- ZAČETEK NOVE KODE: Zgodovina potresov ---
+                        history = []
+                        
+                        for earthquake in filtered_earthquakes:
+                            # Parse lokalnega časa iz TIME
+                            dt_local_hist = parse_datetime(earthquake.get("TIME"))
+                            try:
+                                dt_utc_hist = pytz.UTC.localize(datetime.strptime(earthquake.get("TIME_ORIG"), "%Y-%m-%d %H:%M:%S"))
+                            except Exception:
+                                dt_utc_hist = None
+
+                            lat_str_hist = f"{earthquake.get('LAT')}".replace(".", ",") if earthquake.get("LAT") is not None else "Neznano"
+                            lon_str_hist = f"{earthquake.get('LON')}".replace(".", ",") if earthquake.get("LON") is not None else "Neznano"
+                            lat_lon_hist = f"{lat_str_hist} / {lon_str_hist}"
+
+                            depth_hist = f"{earthquake.get('DEPTH')} km" if earthquake.get("DEPTH") is not None else "Neznano"
+                            mag_hist = format_decimal(earthquake.get("MAG1"))
+                            intensity_hist = earthquake.get("INTENZITETA") if earthquake.get("INTENZITETA") is not None else "-"
+                            verified_hist = "DA" if earthquake.get("REVISION") == 1 else "NE"
+                            
+                            earthquake_data = {
+                                "Lokalni čas potresa": format_datetime(dt_local_hist),
+                                "Čas potresa v UTC": format_datetime(dt_utc_hist),
+                                "Nadžarišče": earthquake.get("GEOLOC", "Neznano"),
+                                "Zemljepisna širina/dolžina": lat_lon_hist,
+                                "Globina": depth_hist,
+                                "Magnituda": mag_hist,
+                                "Največja intenziteta EMS-98": intensity_hist,
+                                "Preverjeno s strani seizmologa": verified_hist,
+                            }
+                            history.append(earthquake_data)
+
+                        self._attributes["Zgodovina potresov"] = history
+                        # --- KONEC NOVE KODE ---
+
         except Exception as e:
             _LOGGER.error("Prišlo je do izjeme pri async_update: %s", e)
