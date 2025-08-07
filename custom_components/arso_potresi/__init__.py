@@ -11,7 +11,6 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Odstrani integracijo."""
-    # Popravljeno ime funkcije iz 'unloads' v 'unload'
     return await hass.config_entries.async_forward_entry_unload(config_entry, "sensor")
 
 async def async_reload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> None:
