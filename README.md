@@ -37,7 +37,8 @@ Data provided by ARSO Potresi - Agencija RS za okolje. This integration is unoff
 - **Real-Time Earthquake Data:** Fetches the latest earthquake information from the ARSO Potresi API.
 - **Sensor Entity:** Displays key data such as local and UTC times, location, coordinates, depth, magnitude, EMS-98 intensity, and verification status.
 - **Device Registry Support:** The integration creates a device with proper device info and a unique ID.
-- **Config Flow:** Configurable via Home Assistant’s UI, with a single option to set the update interval (in minutes).
+- **Fully Configurable via UI:** The integration can be set up and reconfigured through the Home Assistant UI.
+- **Customizable Earthquake History:** History of earthquakes is now stored as an attribute and can be limited to a specific number of days.
 
 ## Installation
 
@@ -67,17 +68,20 @@ This integration is configured via the UI using Home Assistant's Config Flow. **
 
 1. Go to **Settings > Devices & Services > Integrations**.
 2. Click **Add Integration** and search for **ARSO Potresi**.
-3. In the configuration dialog, set the update interval (in minutes).
+3. In the configuration dialog, set the **Update interval** (in minutes) and the **History days** (e.g., 7 days).
 4. Complete the setup. The integration will create a sensor entity named `sensor.arso_potresi` that displays the most recent earthquake’s location as its state and includes all details as attributes.
+
+### Reconfiguration
+You can change the settings at any time without having to delete and re-add the integration. Simply navigate to **Settings > Devices & Services > Integrations**, find the **ARSO Potresi** integration, and click the **Configure** button to edit the options.
 
 ## How It Works
 
 - **Data Fetching:** The sensor fetches data from the ARSO Potresi API. It assumes that the first element in the returned JSON is the latest earthquake event.
-- **Data Formatting:**  
-- **Local Time:** Formatted from the API's `TIME` field (e.g., "20. 2. 2025 ob 23.11").
-- **UTC Time:** Derived from the `TIME_ORIG` field.
-- **Coordinates:** Latitude and longitude values are formatted with a comma as the decimal separator.
-- **Additional Attributes:** Depth (with "km" appended), magnitude (formatted with one decimal and a comma), EMS-98 intensity (displayed as "-" if null), and verification status based on the `REVISION` field.
+- **Earthquake History:** The integration now stores a list of earthquakes in the attribute **`Zgodovina potresov`**. This list includes all earthquakes that occurred within the selected time period (configured by `history_days`). This allows you to display historical data in a Lovelace card.
+- **Data Formatting:** - **Local Time:** Formatted from the API's `TIME` field (e.g., "20. 2. 2025 ob 23.11").
+    - **UTC Time:** Derived from the `TIME_ORIG` field.
+    - **Coordinates:** Latitude and longitude values are formatted with a comma as the decimal separator.
+    - **Additional Attributes:** Depth (with "km" appended), magnitude (formatted with one decimal and a comma), EMS-98 intensity (displayed as "-" if null), and verification status based on the `REVISION` field.
 
 ## Device Information
 
