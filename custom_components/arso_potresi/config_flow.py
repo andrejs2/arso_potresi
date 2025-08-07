@@ -38,7 +38,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
 
-        # Pridobi trenutne vrednosti za skeniranje in zgodovino iz konfiguracije
+    
         options = self.config_entry.data
         options_schema = vol.Schema({
             vol.Optional(
