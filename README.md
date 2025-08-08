@@ -34,11 +34,12 @@ Data provided by ARSO Potresi - Agencija RS za okolje. This integration is unoff
 
 ## Features
 
-- **Real-Time Earthquake Data:** Fetches the latest earthquake information from the ARSO Potresi API.
-- **Sensor Entity:** Displays key data such as local and UTC times, location, coordinates, depth, magnitude, EMS-98 intensity, and verification status.
-- **Device Registry Support:** The integration creates a device with proper device info and a unique ID.
-- **Fully Configurable via UI:** The integration can be set up and reconfigured through the Home Assistant UI.
-- **Customizable Earthquake History:** History of earthquakes is now stored as an attribute and can be limited to a specific number of days.
+- **Real-Time Data:** Fetches the latest earthquake information directly from the ARSO Potresi API.
+- **Dual Sensors:**
+    - **Main Sensor (`sensor.arso_potresi`):** Displays key data such as local and UTC times, location, coordinates, depth, magnitude, EMS-98 intensity, and verification status.
+    - **Map Sensor (`sensor.zadnji_potres_magnituda`):** Enables easy visualization of the latest earthquake on the Home Assistant map, with the magnitude displayed inside the marker.
+- **Structured History:** A detailed history of past earthquakes is available as structured attributes on the main sensor.
+- **Fully Configurable via UI:** The integration can be fully configured through the Home Assistant UI, including the update interval and the number of days for historical data.
 
 ## Installation
 
@@ -73,6 +74,24 @@ This integration is configured via the UI using Home Assistant's Config Flow. **
 
 ### Reconfiguration
 You can change the settings at any time without having to delete and re-add the integration. Simply navigate to **Settings > Devices & Services > Integrations**, find the **ARSO Potresi** integration, and click the **Configure** button to edit the options.
+
+### Map Display
+To display the latest earthquake on a map, use the standard map card with the following configuration:
+
+## Map Display
+
+To display the latest earthquake on a map, use the standard `map` card with the following configuration:
+
+```yaml
+type: map
+entities:
+  - entity: sensor.zadnji_potres_magnituda
+    label_mode: state
+```
+
+
+![Zajeta slika](https://github.com/user-attachments/assets/67073a46-3da6-4525-a64f-0fa9629eeaec)
+
 
 ## How It Works
 
