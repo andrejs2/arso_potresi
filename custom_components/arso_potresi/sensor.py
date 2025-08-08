@@ -95,7 +95,7 @@ class ArsoPotresiMapSensor(Entity):
     @property
     def extra_state_attributes(self): return self._attrs
     @property
-    def unit_of_measurement(self): return "ML"
+    def unit_of_measurement(self): return "M"
     @property
     def state_class(self): return SensorStateClass.MEASUREMENT
     @property
