@@ -159,7 +159,6 @@ class ArsoPotresiSensor(Entity):
 
         all_attrs = {}
         for i, earthquake in enumerate(self._coordinator.data):
-            # Priprava podatkov za vsak potres
             dt_local = parse_datetime(earthquake.get("TIME"))
             try:
                 dt_utc = pytz.UTC.localize(datetime.strptime(earthquake.get("TIME_ORIG"), "%Y-%m-%d %H:%M:%S"))
@@ -170,7 +169,6 @@ class ArsoPotresiSensor(Entity):
             lon_str = str(earthquake.get('LON', '')).replace('.', ',')
             mag_str = str(earthquake.get('MAG1', '')).replace('.', ',')
 
-            # Ključi za atribute - brez indeksa za zadnji potres, z indeksom za ostale
             suffix = "" if i == 0 else f" {i}"
             
             if i > 0:
