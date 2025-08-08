@@ -7,7 +7,7 @@ import pytz
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import Entity
-from homeassistant.const import ATTR_ATTRIBUTION
+from homeassistant.const import ATTR_ATTRIBUTION, ATTR_LATITUDE, ATTR_LONGITUDE
 from homeassistant.util.dt import parse_datetime
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -36,7 +36,7 @@ async def async_setup_entry(
     config_entry: ConfigEntry, 
     async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Nastavi ARSO Potresi senzor iz config entryja."""
+    """Nastavi integracijo preko config entryja."""
     options = config_entry.options or config_entry.data
     scan_interval = options.get("scan_interval", DEFAULT_SCAN_INTERVAL)
     history_days = options.get("history_days", DEFAULT_HISTORY_DAYS)
@@ -118,8 +118,11 @@ class ArsoPotresiSensor(Entity):
                         except Exception:
                             dt_utc = None
 
-                        lat_str = f"{latest.get('LAT')}".replace(".", ",") if latest.get("LAT") is not None else "Neznano"
-                        lon_str = f"{latest.get('LON')}".replace(".", ",") if latest.get("LON") is not None else "Neznano"
+                        lat = latest.get("LAT")
+                        lon = latest.get("LON")
+
+                        lat_str = f"{lat}".replace(".", ",") if lat is not None else "Neznano"
+                        lon_str = f"{lon}".replace(".", ",") if lon is not None else "Neznano"
                         lat_lon = f"{lat_str} / {lon_str}"
 
                         depth = f"{latest.get('DEPTH')} km" if latest.get("DEPTH") is not None else "Neznano"
@@ -128,20 +131,32 @@ class ArsoPotresiSensor(Entity):
                         verified = "DA" if latest.get("REVISION") == 1 else "NE"
 
                         self._state = latest.get("GEOLOC", "Neznano")
-                        self._attributes = {
-                            "Lokalni čas potresa": format_datetime(dt_local),
-                            "Čas potresa v UTC": format_datetime(dt_utc),
-                            "Nadžarišče": latest.get("GEOLOC", "Neznano"),
-                            "Zemljepisna širina/dolžina": lat_lon,
-                            "Globina": depth,
-                            "Magnituda": mag,
-                            "Največja intenziteta EMS-98": intensity,
-                            "Preverjeno s strani seizmologa": verified,
-                            ATTR_ATTRIBUTION: ATTRIBUTION,
-                        }
                         
-                        history = []
-                        for earthquake in filtered_earthquakes:
+                        # Izbrišemo stare atribute, da se ne kopičijo
+                        self._attributes.clear()
+
+                        # Atributi za zadnji potres
+                        self._attributes["Lokalni čas potresa"] = format_datetime(dt_local)
+                        self._attributes["Čas potresa v UTC"] = format_datetime(dt_utc)
+                        self._attributes["Nadžarišče"] = latest.get("GEOLOC", "Neznano")
+                        self._attributes["Zemljepisna širina/dolžina"] = lat_lon
+                        self._attributes["Globina"] = depth
+                        self._attributes["Magnituda"] = mag
+                        self._attributes["Največja intenziteta EMS-98"] = intensity
+                        self._attributes["Preverjeno s strani seizmologa"] = verified
+                        self._attributes[ATTR_ATTRIBUTION] = ATTRIBUTION
+                        
+                        # Dodana ločena atributa za latitudo in longitudo za prikaz na zemljevidu
+                        if lat is not None:
+                             self._attributes[ATTR_LATITUDE] = float(lat)
+                        if lon is not None:
+                             self._attributes[ATTR_LONGITUDE] = float(lon)
+                        
+                        # --- ZAČETEK POPRAVLJENE KODE: Atributi za pretekle potrese ---
+                        # Ustvarimo ločene atribute za vsak pretekli potres
+                        for i, earthquake in enumerate(filtered_earthquakes[1:]):
+                            idx = i + 1
+                            
                             dt_local_hist = parse_datetime(earthquake.get("TIME"))
                             try:
                                 dt_utc_hist = pytz.UTC.localize(datetime.strptime(earthquake.get("TIME_ORIG"), "%Y-%m-%d %H:%M:%S"))
@@ -157,19 +172,16 @@ class ArsoPotresiSensor(Entity):
                             intensity_hist = earthquake.get("INTENZITETA") if earthquake.get("INTENZITETA") is not None else "-"
                             verified_hist = "DA" if earthquake.get("REVISION") == 1 else "NE"
                             
-                            earthquake_data = {
-                                "Lokalni čas potresa": format_datetime(dt_local_hist),
-                                "Čas potresa v UTC": format_datetime(dt_utc_hist),
-                                "Nadžarišče": earthquake.get("GEOLOC", "Neznano"),
-                                "Zemljepisna širina/dolžina": lat_lon_hist,
-                                "Globina": depth_hist,
-                                "Magnituda": mag_hist,
-                                "Največja intenziteta EMS-98": intensity_hist,
-                                "Preverjeno s strani seizmologa": verified_hist,
-                            }
-                            history.append(earthquake_data)
-
-                        self._attributes["Zgodovina potresov"] = history
+                            # Dodamo atribute za pretekli potres na prvi ravni
+                            self._attributes[f"--- Pretekli potres {idx} ---"] = ""
+                            self._attributes[f"Lokalni čas potresa {idx}"] = format_datetime(dt_local_hist)
+                            self._attributes[f"Čas potresa v UTC {idx}"] = format_datetime(dt_utc_hist)
+                            self._attributes[f"Nadžarišče {idx}"] = earthquake.get("GEOLOC", "Neznano")
+                            self._attributes[f"Zemljepisna širina/dolžina {idx}"] = lat_lon_hist
+                            self._attributes[f"Globina {idx}"] = depth_hist
+                            self._attributes[f"Magnituda {idx}"] = mag_hist
+                            self._attributes[f"Največja intenziteta EMS-98 {idx}"] = intensity_hist
+                            self._attributes[f"Preverjeno s strani seizmologa {idx}"] = verified_hist
 
         except Exception as e:
             _LOGGER.error("Prišlo je do izjeme pri async_update: %s", e)
