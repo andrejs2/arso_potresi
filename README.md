@@ -76,9 +76,6 @@ This integration is configured via the UI using Home Assistant's Config Flow. **
 You can change the settings at any time without having to delete and re-add the integration. Simply navigate to **Settings > Devices & Services > Integrations**, find the **ARSO Potresi** integration, and click the **Configure** button to edit the options.
 
 ### Map Display
-To display the latest earthquake on a map, use the standard map card with the following configuration:
-
-## Map Display
 
 To display the latest earthquake on a map, use the standard `map` card with the following configuration:
 
